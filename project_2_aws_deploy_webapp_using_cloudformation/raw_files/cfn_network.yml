@@ -192,6 +192,23 @@ Resources:
             RouteTableId: !Ref PrivateRouteTable2
             SubnetId: !Ref PrivateSubnet2
 
+    VPCEndpointS3Bucket:
+        Type: AWS::EC2::VPCEndpointS3Bucket
+        Properties:
+            PolicyDocument:
+                Statement:
+                - Effect: Allow
+                  Action:
+                    - 's3:GetObject'
+                  Resource:
+                    - !Join ["", ['arn:aws:s3:::', !Sub "${S3DomainName}",'/']]
+              RouteTableIds:
+                - !Ref routetableA
+                - !Ref routetableB
+              ServiceName: !Sub "com.amazonaws.${AWS::Region}.s3"
+              VpcId: !Ref VPCID
+
+
   Outputs:
     VPC:
         Description: A reference to the created VPC
