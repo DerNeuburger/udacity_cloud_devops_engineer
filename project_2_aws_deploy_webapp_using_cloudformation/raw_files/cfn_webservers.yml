@@ -8,7 +8,7 @@ Description: >
              > Contains cloudformation configuration for the cloud's webservers
 
 Resources:
-    LBSecGroup:
+    LoadBalancerSecGroup:
         Type: AWS::EC2::SecurityGroup
         Properties:
             GroupDescription: Allow http to our load balancer
@@ -92,7 +92,7 @@ Resources:
         - Fn::ImportValue: !Sub "${EnvironmentName}-PUB1-NET"
         - Fn::ImportValue: !Sub "${EnvironmentName}-PUB2-NET"
         SecurityGroups:
-        - Ref: LBSecGroup
+        - Ref: LoadBalancerSecGroup
     Listener:
       Type: AWS::ElasticLoadBalancingV2::Listener
       Properties:
@@ -129,3 +129,38 @@ Resources:
           VpcId:
             Fn::ImportValue:
               Fn::Sub: "${EnvironmentName}-VPCID"
+
+    BastionHostLaunchConfig:
+        Type: AWS::AutoScaling::LaunchConfiguration
+        Properties:
+          UserData:
+            Fn::Base64: !Sub |
+              #!/bin/bash
+              apt-get update -y
+              apt-get install unzip awscli -y
+              systemctl service start sshd
+
+          ImageId: ami-0ec1ba09723e5bfac
+          IamInstanceProfile: !Sub "${EnvironmentName}-IAM-INST-APP"
+          SecurityGroups:
+          - Ref: WebServerSecGroup
+          InstanceType: t2.medium
+
+    BastionHostAutoScalingGroup:
+        Type: AWS::AutoScaling::AutoScalingGroup
+        Properties:
+            VPCZoneIdentifier:
+              Fn::Split:
+                - ","
+                - Fn::ImportValue:
+                      Fn::Sub: ${EnvironmentName}-PUB-NETS
+            LaunchConfigurationName: !Ref BastionHostLaunchConfig
+            MinSize: '2'
+            MaxSize: '2'
+
+Outputs:
+    DNSWebAppLB:
+        Description: DNS Name of the WebApp's Load Balancer
+        Value: !Join ["", ["http://",!GetAtt WebAppLB.DNSName]]
+        Export:
+          Name: !Sub ${EnvironmentName}-LB-DNS-NAME
