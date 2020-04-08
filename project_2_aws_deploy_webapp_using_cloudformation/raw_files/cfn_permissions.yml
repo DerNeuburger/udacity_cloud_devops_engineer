@@ -1,0 +1,37 @@
+####################################################
+# Udacity Project 2 - Deploy WebApp Cloudformation #
+####################################################
+
+Description: >
+    Author: Nicolas Neuburger / Udacity Nanodegree Cloud DevOps Engineer
+    Purpose: > Project 2 - Deployment WebApp using CloudFormation
+             > Contains cloudformation configuration for the cloud's permissions
+
+Resources:
+    UdacityS3ReadOnlyEC2:
+        Type: AWS::IAM::Role
+        Properties:
+            RoleName: UdacityS3ReadOnlyEC2
+            AssumeRolePolicyDocument:
+                Statement:
+                  - Effect: Allow
+                    Principal:
+                        Service:
+                            - s3.amazonaws.com
+                    Action:
+                    - 's3:List*'
+                      's3:GetBucketLocation',
+                      's3:GetBucketPolicy'
+                      's3:GetLifecycleConfiguration'
+    ProfileWithRolesForOurApp:
+        Type: AWS::IAM::InstanceProfile
+        Properties:
+            Roles:
+                - UdacityS3ReadOnlyEC2
+
+Outputs:
+    ProfileWithRolesForOurApp:
+        Description: IAM Instance Profile defined for the WebApp to contact S3 services
+        Value: !Ref ProfileWithRolesForOurApp
+        Export:
+          Name: !Sub ${EnvironmentName}-IAM-INST-APP
