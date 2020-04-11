@@ -65,6 +65,6 @@ Outputs:
         Name: !Sub "${EnvironmentName}-IAM-INST-APP"
   ProfileWithRolesForOurApp:
       Description: ARN of IAM Instance Profile defined for the WebApp to contact S3 services
-      Value: !Sub ProfileWithRolesForOurApp.Arn
+      Value: !GetAtt "ProfileWithRolesForOurApp.Arn"
       Export:
         Name: !Sub "${EnvironmentName}-IAM-INST-APP-ARN"
