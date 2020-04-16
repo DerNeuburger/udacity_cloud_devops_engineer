@@ -9,3 +9,7 @@ In this project a static website was hosted on Amazon Web Services using an Amaz
 ## Project 2 - Hosting a high available Web App using AWS CloudFormation
 
 This project was dedicated to build a cloud architecture using AWS CloudFormation. AWS EC2 server instances are created in using EC2 Auto-Scaling. The source code of the web application is taken from an AWS S3 bucket hosted by Udacity. User requests to the web application are forwarded using an Application Load Balancer. The load balancer is located in a public subnet and is permitted to forward the traffic via NAT gateway to a private subnet where the web server resides. In order to allow maintenance bastion hosts are generated in the public subnets which allow inbound SSH traffic from a specific developer IP address and have the permission to SSH into the web servers. 
+
+## Project 3 - Continuous Deployment with Jenkins for static website
+
+For this project an AWS EC2 instance is launched which executes Jenkins server. The server is linked to a github repository which contains of an HTML and a Jenkins file. Based on commits, pushed to the repository's remote, the jenkins pipeline checks the HTML file using lint and uploads the file to an AWS S3 bucket if it passes. In the zipped archive screenshots can be found, that show the process and were required for submission.
